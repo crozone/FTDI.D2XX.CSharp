@@ -5,6 +5,8 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FTDI.D2XX.Wrapper", "src\FTDI.D2XX.Wrapper\FTDI.D2XX.Wrapper.csproj", "{13A530CB-CFDA-46B8-B89E-71203DFAC8F2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTDI.D2XX.TestConsole", "src\FTDI.D2XX.TestConsole\FTDI.D2XX.TestConsole.csproj", "{211936D9-F5B8-47EA-ACA8-8BF8BA047416}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{13A530CB-CFDA-46B8-B89E-71203DFAC8F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13A530CB-CFDA-46B8-B89E-71203DFAC8F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13A530CB-CFDA-46B8-B89E-71203DFAC8F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{211936D9-F5B8-47EA-ACA8-8BF8BA047416}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{211936D9-F5B8-47EA-ACA8-8BF8BA047416}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{211936D9-F5B8-47EA-ACA8-8BF8BA047416}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{211936D9-F5B8-47EA-ACA8-8BF8BA047416}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
