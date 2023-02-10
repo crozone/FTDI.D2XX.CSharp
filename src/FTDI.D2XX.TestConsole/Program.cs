@@ -42,7 +42,6 @@ namespace FTDI.D2XX.TestConsole
 
             using (FtdiD2xxDevice device = new FtdiD2xxDevice())
             {
-                byte[] sendBuffer = new byte[1];
                 Console.WriteLine($"Opening device index {deviceIndex}");
                 device.OpenByIndex(deviceIndex);
                 //device.OpenBySerial(serial);
@@ -72,9 +71,8 @@ namespace FTDI.D2XX.TestConsole
                         for (int j = 0; j < 8; j++)
                         {
                             currentFlags ^= (byte)(1 << j);
-                            sendBuffer.AsSpan().Fill(currentFlags);
 
-                            int bytesWritten = device.Write(sendBuffer, sendBuffer.Length);
+                            int bytesWritten = device.WriteByte(currentFlags);
 
                             Thread.Sleep(50);
                         }
