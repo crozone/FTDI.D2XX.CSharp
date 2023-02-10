@@ -127,6 +127,46 @@ namespace FTDI.D2XX.Wrapper
         }
 
         /// <summary>
+        /// Read data from the device.
+        /// 
+        /// The number of bytes in the receive queue can be determined by calling GetStatus or GetQueueStatus, and passed to Read as bytesToRead so that the function reads the device and returns immediately.
+        /// 
+        /// When a read timeout value has been specified in a previous call to SetTimeouts, Read returns when the timer expires or bytesToRead have been read, whichever occurs first.
+        /// If the timeout occurred, Read reads available data into the buffer and the return value will be less than the returned read bytes count.
+        /// </summary>
+        /// <param name="readBuffer">Buffer that will receive bytes read from the device</param>
+        /// <returns>The number of bytes read from the device.</returns>
+        /// <exception cref="ArgumentException"></exception>
+        public int Read(Span<byte> readBuffer)
+        {
+            ThrowIfDisposed();
+            ThrowIfNotOpen();
+
+            FT_STATUS result;
+            int bytesRead;
+            unsafe
+            {
+                fixed (byte* ptr = readBuffer)
+                {
+                    result = FtFunctions.FT_Read(ftHandle, (IntPtr)ptr, readBuffer.Length, out bytesRead);
+                }
+            }
+            ThrowIfNotOK(result, nameof(FtFunctions.FT_Read));
+            return bytesRead;
+        }
+
+        /// <summary>
+        /// Read a single byte from the device
+        /// </summary>
+        /// <returns>The byte read from the device, or null if the read timed out</returns>
+        public byte? ReadByte()
+        {
+            Span<byte> readBuffer = stackalloc byte[1];
+            int bytesRead = Read(readBuffer);
+            return bytesRead > 0 ? readBuffer[0] : null;
+        }
+
+        /// <summary>
         /// Write data to the device.
         /// </summary>
         /// <param name="buffer">Buffer that contains the data to be written to the device.</param>
@@ -144,6 +184,40 @@ namespace FTDI.D2XX.Wrapper
             ThrowIfNotOK(result, nameof(FtFunctions.FT_Write));
 
             return bytesWritten;
+        }
+
+        /// <summary>
+        /// Write data to the device.
+        /// </summary>
+        /// <param name="writeBuffer">Buffer that contains the data to be written to the device.</param>
+        /// <returns>The number of bytes written to the device.</returns>
+        public int Write(Span<byte> writeBuffer)
+        {
+            ThrowIfDisposed();
+            ThrowIfNotOpen();
+
+            FT_STATUS result;
+            int bytesWritten;
+            unsafe
+            {
+                fixed (byte* ptr = writeBuffer)
+                {
+                    result = FtFunctions.FT_Write(ftHandle, (IntPtr)ptr, writeBuffer.Length, out bytesWritten);
+                }
+            }
+            ThrowIfNotOK(result, nameof(FtFunctions.FT_Write));
+            return bytesWritten;
+        }
+
+        /// <summary>
+        /// Write a single byte to the device
+        /// </summary>
+        /// <param name="writeByte">Single byte to be written to the device.</param>
+        /// <returns>The number of bytes written to the device.</returns>
+        public int WriteByte(byte writeByte)
+        {
+            Span<byte> writeBuffer = stackalloc byte[] { writeByte };
+            return Write(writeBuffer);
         }
 
         /// <summary>

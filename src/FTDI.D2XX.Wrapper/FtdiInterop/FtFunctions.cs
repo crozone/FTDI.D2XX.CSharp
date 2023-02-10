@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 using FTDI.D2XX.Wrapper.FtdiInterop.Enums;
 using FTDI.D2XX.Wrapper.FtdiInterop.Models;
@@ -89,6 +90,29 @@ namespace FTDI.D2XX.Wrapper.FtdiInterop
         public static extern FT_STATUS FT_Read([In] FT_HANDLE ftHandle, [In] byte[] lpBuffer, [In] int dwBytesToRead, [Out] out int lpdwBytesReturned);
 
         /// <summary>
+        /// Read data from the device.
+        /// 
+        /// FT_Read always returns the number of bytes read in lpdwBytesReturned.
+        /// This function does not return until dwBytesToRead bytes have been read into the buffer.
+        /// The number of bytes in the receive queue can be determined by calling FT_GetStatus or FT_GetQueueStatus, and passed to FT_Read as dwBytesToRead so that the function reads the device and returns immediately.
+        /// 
+        /// When a read timeout value has been specified in a previous call to FT_SetTimeouts, FT_Read returns when the timer expires or dwBytesToRead have been read, whichever occurs first.
+        /// If the timeout occurred, FT_Read reads available data into the buffer and returns FT_OK.
+        /// An application should use the function return value and lpdwBytesReturned when processing the buffer.
+        /// If the return value is FT_OK, and lpdwBytesReturned is equal to dwBytesToRead then FT_Read has completed normally.
+        /// If the return value is FT_OK, and lpdwBytesReturned is less then dwBytesToRead then a timeout has occurred and the read has been partially completed.
+        /// Note that if a timeout occurred and no data was read, the return value is still FT_OK.
+        /// A return value of FT_IO_ERROR suggests an error in the parameters of the function, or a fatal error like a USB disconnect has occurred.
+        /// </summary>
+        /// <param name="ftHandle">Handle of the device.</param>
+        /// <param name="lpBuffer">Pointer to the buffer that receives the data from the device.</param>
+        /// <param name="dwBytesToRead">Number of bytes to be read from the device.</param>
+        /// <param name="lpdwBytesReturned">Pointer to a variable of type DWORD which receives the number of bytes read from the device.</param>
+        /// <returns>FT_OK if successful, FT_IO_ERROR otherwise.</returns>
+        [DllImport(Ftd2xxLibName)]
+        public static extern FT_STATUS FT_Read([In] FT_HANDLE ftHandle, [In] IntPtr lpBuffer, [In] int dwBytesToRead, [Out] out int lpdwBytesReturned);
+
+        /// <summary>
         /// Write data to the device.
         /// </summary>
         /// <param name="ftHandle">Handle of the device.</param>
@@ -98,6 +122,17 @@ namespace FTDI.D2XX.Wrapper.FtdiInterop
         /// <returns>FT_OK if successful, otherwise the return value is an FT error code.</returns>
         [DllImport(Ftd2xxLibName)]
         public static extern FT_STATUS FT_Write([In] FT_HANDLE ftHandle, [In] byte[] lpBuffer, [In] int dwBytesToWrite, [Out] out int lpdwBytesWritten);
+
+        /// <summary>
+        /// Write data to the device.
+        /// </summary>
+        /// <param name="ftHandle">Handle of the device.</param>
+        /// <param name="lpBuffer">Pointer to the buffer that contains the data to be written to the device.</param>
+        /// <param name="dwBytesToWrite">Number of bytes to write to the device.</param>
+        /// <param name="lpdwBytesWritten">Pointer to a variable of type DWORD which receives the number of bytes written to the device.</param>
+        /// <returns>FT_OK if successful, otherwise the return value is an FT error code.</returns>
+        [DllImport(Ftd2xxLibName)]
+        public static extern FT_STATUS FT_Write([In] FT_HANDLE ftHandle, [In] IntPtr lpBuffer, [In] int dwBytesToWrite, [Out] out int lpdwBytesWritten);
 
         /// <summary>
         /// This function sets the read and write timeouts for the device.
