@@ -43,25 +43,26 @@ However, some are lower priority and still TODOs.
 
 Many USB to GPIO/Relay boards (eg the [SainSmart USB to Relay boards](https://www.umart.com.au/product/sainsmart-usb-eight-channel-relay-board-for-automation-12-v-60454)) are implemented using an FTDI FT245R class chip. The relays are wired to each of the 8 output pins on the IC via a high current driver.
 
-By default, the FTDI FT245R devices behave like a standard USB to serial converter, and the output pins are set to the standard serial pins TX/RX/DTR/RTS, etc...
+You may notice that simply opening the Virtual COM Port (VCP) and trying to write to it does nothing.
 
-Treating it like a standard Virtual COM Port will therefore not work.
+This is because by default, the FTDI FT245R devices start in "regular interface mode", which requires the "RD" pin to be strobed in order to read each successive byte from the receive FIFO. This is undesirable since the relay board does not operate in this way, and simply opening and writing to the VCP will not work. The device is stuck in "regular interface mode" and cannot be changed out of this mode from the VCP interface alone.
 
-Instead, the device needs to be put into a bitbang bit mode, which causes all of the 8 output pins to latch to the value of the last byte received.
-This mode can only be set by calling into the ftd2xx.dll, which in turn talks to the FTDI Direct Mode driver to send a SetBitMode request to the device.
+Instead, the device needs to be put into a special bitbang bit mode, which causes all of the 8 output pins to immediately latch to the value of the last byte received without any activity on the RD pin.
+These special modes can only be set by calling into the ftd2xx.dll, which in turn talks to the FTDI Direct Mode driver to send a SetBitMode request to the device. After this, the device will behave as needed for the relay board.
 
 On Windows, the Direct Driver is installed in parallel with the Virtual COM Port driver (VCP) by the CDM driver package.
 Windows 10 usually finds this driver on Windows Update without any additional setup.
 
 On Linux/MacOS, only one driver can be installed at a time. The VCP driver will need to be uninstalled and then the Direct Driver installed in its place.
 
-### Example
+### Relay/GPIO board bitbang example
 
 ```csharp
 // Create the device
 using (FtdiD2xxDevice device = new FtdiD2xxDevice())
 {
-    // Open the device by zero based index
+    // Open the first device by zero based index.
+    // This will throw an exception if the device is not found or could not be opened.
     device.OpenByIndex(0);
     
     // It's also possible to open the device by serial string, description string, or location long
